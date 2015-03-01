@@ -138,6 +138,8 @@ public class ForecastFragment extends Fragment
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
+
+                Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr);
             }
             catch(IOException e)
             {
