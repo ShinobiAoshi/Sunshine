@@ -1,4 +1,0 @@
-﻿[user]
-	name = ShinobiAoshi
-	email = shinobiaoshi@gmail.com
-
