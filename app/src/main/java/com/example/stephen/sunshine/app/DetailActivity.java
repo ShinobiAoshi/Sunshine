@@ -5,10 +5,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ShareActionProvider;
 
 
 public class DetailActivity extends ActionBarActivity
 {
+    ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate (Bundle savedInstanceState)
@@ -23,6 +25,8 @@ public class DetailActivity extends ActionBarActivity
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_detail, menu);
+        MenuItem item = menu.findItem(R.id.action_share);
+        mShareActionProvider = (ShareActionProvider) item.getActionProvider();
         return true;
     }
 
@@ -34,8 +38,14 @@ public class DetailActivity extends ActionBarActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if(id == R.id.action_settings)
+        {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+        if(id == R.id.action_share)
         {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
