@@ -1,11 +1,12 @@
 package com.example.stephen.sunshine.app;
 
 import android.content.Intent;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ShareActionProvider;
+import android.support.v7.widget.ShareActionProvider;
 
 
 public class DetailActivity extends ActionBarActivity
@@ -26,7 +27,7 @@ public class DetailActivity extends ActionBarActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_detail, menu);
         MenuItem item = menu.findItem(R.id.action_share);
-        mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+        mShareActionProvider = (ShareActionProvider)  MenuItemCompat.getActionProvider(item);
         return true;
     }
 
