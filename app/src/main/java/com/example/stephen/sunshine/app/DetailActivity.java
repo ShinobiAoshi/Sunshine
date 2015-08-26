@@ -1,23 +1,25 @@
 package com.example.stephen.sunshine.app;
 
 import android.content.Intent;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v7.widget.ShareActionProvider;
 
 
 public class DetailActivity extends ActionBarActivity
 {
-    ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new DetailActivityFragment())
+                    .commit();
+        }
     }
 
 
@@ -26,8 +28,6 @@ public class DetailActivity extends ActionBarActivity
     {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_detail, menu);
-        MenuItem item = menu.findItem(R.id.action_share);
-        mShareActionProvider = (ShareActionProvider)  MenuItemCompat.getActionProvider(item);
         return true;
     }
 
@@ -40,13 +40,6 @@ public class DetailActivity extends ActionBarActivity
         int id = item.getItemId();
 
         if(id == R.id.action_settings)
-        {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        }
-
-        if(id == R.id.action_share)
         {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
