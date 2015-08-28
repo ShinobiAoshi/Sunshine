@@ -23,9 +23,9 @@ import com.example.stephen.sunshine.app.data.WeatherContract.WeatherEntry;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
-    private static final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
+    private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
     private static final String FORECAST_SHARE_HASHTAG = "#SunshineApp";
 
@@ -50,7 +50,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private static final int COL_WEATHER_MAX_TEMP = 3;
     private static final int COL_WEATHER_MIN_TEMP = 4;
 
-    public DetailActivityFragment ()
+    public DetailFragment()
     {
         setHasOptionsMenu(true);
     }
