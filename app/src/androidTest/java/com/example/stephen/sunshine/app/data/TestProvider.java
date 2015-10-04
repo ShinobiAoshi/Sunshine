@@ -39,6 +39,29 @@ import com.example.stephen.sunshine.app.data.WeatherContract.WeatherEntry;
 public class TestProvider extends AndroidTestCase {
 
     public static final String LOG_TAG = TestProvider.class.getSimpleName();
+    static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
+
+    static ContentValues[] createBulkInsertWeatherValues(long locationRowId) {
+        long currentTestDate = TestUtilities.TEST_DATE;
+        long millisecondsInADay = 1000 * 60 * 60 * 24;
+        ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
+
+        for (int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++, currentTestDate += millisecondsInADay) {
+            ContentValues weatherValues = new ContentValues();
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationRowId);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATE, currentTestDate);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, 1.1);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, 1.2 + 0.01 * (float) i);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, 1.3 - 0.01 * (float) i);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, 75 + i);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, 65 - i);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, "Asteroids");
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, 5.5 + 0.2 * (float) i);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, 321);
+            returnContentValues[i] = weatherValues;
+        }
+        return returnContentValues;
+    }
 
     /*
        This helper function deletes all records from both database tables using the ContentProvider.
@@ -130,7 +153,7 @@ public class TestProvider extends AndroidTestCase {
 
             // Make sure that the registered authority matches the authority from the Contract.
             assertEquals("Error: WeatherProvider registered with authority: " + providerInfo.authority +
-                    " instead of authority: " + WeatherContract.CONTENT_AUTHORITY,
+                            " instead of authority: " + WeatherContract.CONTENT_AUTHORITY,
                     providerInfo.authority, WeatherContract.CONTENT_AUTHORITY);
         } catch (PackageManager.NameNotFoundException e) {
             // I guess the provider isn't registered correctly.
@@ -138,6 +161,39 @@ public class TestProvider extends AndroidTestCase {
                     false);
         }
     }
+
+    /*
+        This test uses the database directly to insert and then uses the ContentProvider to
+        read out the data.  Uncomment this test to see if your location queries are
+        performing correctly.
+     */
+//    public void testBasicLocationQueries() {
+//        // insert our test records into the database
+//        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
+//        SQLiteDatabase db = dbHelper.getWritableDatabase();
+//
+//        ContentValues testValues = TestUtilities.createNorthPoleLocationValues();
+//        long locationRowId = TestUtilities.insertNorthPoleLocationValues(mContext);
+//
+//        // Test the basic content provider query
+//        Cursor locationCursor = mContext.getContentResolver().query(
+//                LocationEntry.CONTENT_URI,
+//                null,
+//                null,
+//                null,
+//                null
+//        );
+//
+//        // Make sure we get the correct cursor out of the database
+//        TestUtilities.validateCursor("testBasicLocationQueries, location query", locationCursor, testValues);
+//
+//        // Has the NotificationUri been set correctly? --- we can only test this easily against API
+//        // level 19 or greater because getNotificationUri was added in API level 19.
+//        if ( Build.VERSION.SDK_INT >= 19 ) {
+//            assertEquals("Error: Location Query did not properly set NotificationUri",
+//                    locationCursor.getNotificationUri(), LocationEntry.CONTENT_URI);
+//        }
+//    }
 
     /*
             This test doesn't touch the database.  It verifies that the ContentProvider returns
@@ -175,7 +231,6 @@ public class TestProvider extends AndroidTestCase {
                 LocationEntry.CONTENT_TYPE, type);
     }
 
-
     /*
         This test uses the database directly to insert and then uses the ContentProvider to
         read out the data.  Uncomment this test to see if the basic weather query functionality
@@ -211,39 +266,6 @@ public class TestProvider extends AndroidTestCase {
     }
 
     /*
-        This test uses the database directly to insert and then uses the ContentProvider to
-        read out the data.  Uncomment this test to see if your location queries are
-        performing correctly.
-     */
-//    public void testBasicLocationQueries() {
-//        // insert our test records into the database
-//        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
-//        SQLiteDatabase db = dbHelper.getWritableDatabase();
-//
-//        ContentValues testValues = TestUtilities.createNorthPoleLocationValues();
-//        long locationRowId = TestUtilities.insertNorthPoleLocationValues(mContext);
-//
-//        // Test the basic content provider query
-//        Cursor locationCursor = mContext.getContentResolver().query(
-//                LocationEntry.CONTENT_URI,
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//
-//        // Make sure we get the correct cursor out of the database
-//        TestUtilities.validateCursor("testBasicLocationQueries, location query", locationCursor, testValues);
-//
-//        // Has the NotificationUri been set correctly? --- we can only test this easily against API
-//        // level 19 or greater because getNotificationUri was added in API level 19.
-//        if ( Build.VERSION.SDK_INT >= 19 ) {
-//            assertEquals("Error: Location Query did not properly set NotificationUri",
-//                    locationCursor.getNotificationUri(), LocationEntry.CONTENT_URI);
-//        }
-//    }
-
-    /*
         This test uses the provider to insert and then update the data. Uncomment this test to
         see if your update location is functioning correctly.
      */
@@ -272,7 +294,7 @@ public class TestProvider extends AndroidTestCase {
 
         int count = mContext.getContentResolver().update(
                 LocationEntry.CONTENT_URI, updatedValues, LocationEntry._ID + "= ?",
-                new String[] { Long.toString(locationRowId)});
+                new String[]{Long.toString(locationRowId)});
         assertEquals(count, 1);
 
         // Test to make sure our observer is called.  If not, we throw an assertion.
@@ -298,7 +320,6 @@ public class TestProvider extends AndroidTestCase {
 
         cursor.close();
     }
-
 
     // Make sure we can still delete after adding/updating stuff
     //
@@ -432,30 +453,6 @@ public class TestProvider extends AndroidTestCase {
 
         mContext.getContentResolver().unregisterContentObserver(locationObserver);
         mContext.getContentResolver().unregisterContentObserver(weatherObserver);
-    }
-
-
-    static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
-    static ContentValues[] createBulkInsertWeatherValues(long locationRowId) {
-        long currentTestDate = TestUtilities.TEST_DATE;
-        long millisecondsInADay = 1000*60*60*24;
-        ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
-
-        for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++, currentTestDate+= millisecondsInADay ) {
-            ContentValues weatherValues = new ContentValues();
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationRowId);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATE, currentTestDate);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, 1.1);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, 1.2 + 0.01 * (float) i);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, 1.3 - 0.01 * (float) i);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, 75 + i);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, 65 - i);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, "Asteroids");
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, 5.5 + 0.2 * (float) i);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, 321);
-            returnContentValues[i] = weatherValues;
-        }
-        return returnContentValues;
     }
 
     // Student: Uncomment this test after you have completed writing the BulkInsert functionality

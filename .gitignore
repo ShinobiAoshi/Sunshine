@@ -5,3 +5,6 @@
 .DS_Store
 /build
 .idea/dictionaries/Stephen.xml
+Sunshine.iml
+.idea/
+.idea/compiler.xml
